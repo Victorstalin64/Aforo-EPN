@@ -14,11 +14,11 @@ Sistema web que permite monitorear la ocupación de los espacios de la Escuela P
 
 ## Tecnologías
 
-| Capa | Tecnologías |
-|---|---|
-| Backend | Node.js, Express, JWT, bcrypt, Socket.IO |
-| Frontend | React (Vite), Tailwind CSS, Zustand, React Hook Form, Axios, React Toastify, Socket.IO Client |
-| Control de versiones | Git y GitHub |
+| Capa                 | Tecnologías                                                                                   |
+| -------------------- | --------------------------------------------------------------------------------------------- |
+| Backend              | Node.js, Express, MongoDB (Mongoose), JWT, bcrypt, Socket.IO                                  |
+| Frontend             | React (Vite), Tailwind CSS, Zustand, React Hook Form, Axios, React Toastify, Socket.IO Client |
+| Control de versiones | Git y GitHub                                                                                  |
 
 ## Estructura del repositorio
 
@@ -31,6 +31,7 @@ AforoEPN/
 ## Requisitos previos
 
 - Node.js (versión LTS)
+- MongoDB (local o MongoDB Atlas)
 - Git
 - VS Code (recomendado)
 
@@ -38,21 +39,35 @@ AforoEPN/
 
 ### 1. Clonar el repositorio
 
-```bash
+```
 git clone https://github.com/Victorstalin64/Aforo-EPN.git
 cd Aforo-EPN
 ```
 
 ### 2. Backend
 
-```bash
+```
 cd Aforo-Backend
 npm i
 ```
 
-Crea un archivo `.env` a partir de `.env.example` y completa tus valores. Luego ejecuta:
+Crea un archivo `.env` en la raíz de `Aforo-Backend` (puedes copiar `.env.example`) y completa tus valores:
 
-```bash
+```
+PORT=3000
+MONGODB_URI=tu_cadena_de_conexion_de_mongodb
+JWT_SECRET=una_frase_larga_y_aleatoria
+```
+
+Crea un usuario de prueba:
+
+```
+npm run seed -- Ana Perez ana@epn.edu.ec Clave123
+```
+
+Luego ejecuta:
+
+```
 npm run dev
 ```
 
@@ -60,7 +75,7 @@ El servidor corre en `http://localhost:3000`.
 
 ### 3. Frontend
 
-```bash
+```
 cd Aforo-Frontend
 npm i
 ```
@@ -73,27 +88,75 @@ VITE_BACKEND_URL=http://localhost:3000/api
 
 Luego ejecuta:
 
-```bash
+```
 npm run dev
 ```
 
 La aplicación corre en `http://localhost:5173`.
 
+## API
+
+Base: `http://localhost:3000/api`
+
+| Método | Ruta      | Descripción                     | Autenticación |
+| ------ | --------- | ------------------------------- | ------------- |
+| POST   | `/login`  | Inicia sesión y devuelve un JWT | No            |
+| GET    | `/perfil` | Devuelve los datos del usuario  | Bearer Token  |
+
+### Login
+
+```
+POST /api/login
+```
+
+Body (JSON):
+
+```json
+{
+  "email": "ana@epn.edu.ec",
+  "password": "Clave123"
+}
+```
+
+Respuesta exitosa (200):
+
+```json
+{
+  "msg": "Inicio de sesión exitoso",
+  "token": "eyJhbGciOi...",
+  "rol": "estudiante",
+  "nombre": "Ana",
+  "apellido": "Perez",
+  "_id": "...",
+  "email": "ana@epn.edu.ec"
+}
+```
+
+Errores posibles:
+
+| Código | Motivo                |
+| ------ | --------------------- |
+| 400    | Campos vacíos         |
+| 401    | Password incorrecto   |
+| 403    | Cuenta desactivada    |
+| 404    | Usuario no registrado |
+
+### Perfil
+
+```
+GET /api/perfil
+Authorization: Bearer <token>
+```
+
+Devuelve `_id`, `nombre`, `apellido`, `email` y `rol` del usuario autenticado. Si el token falta, es inválido o expiró, responde 401.
+
 ## Planificación (Scrum)
 
 ### Sprint 0: Configuración inicial
+
 - Configuración del backend (Express, variables de entorno, estructura de carpetas).
 - Configuración del frontend (Vite, React, Tailwind, hook `useFetch`).
 
-### Sprint 1: Módulos
-1. **Autenticación y gestión de usuarios:** registro, login, recuperación de contraseña y roles.
-2. **Gestión de espacios:** CRUD de espacios con su aforo máximo.
-3. **Control de aforo en tiempo real:** registro de entradas y salidas y ocupación actual.
+### Sprint 1
 
-### Sprints siguientes
-- Reserva de cupos con código QR.
-- Predicción de ocupación y panel de analítica.
-
-## Licencia
-
-Proyecto académico, Escuela Politécnica Nacional.
+- Login a nivel de backend.
