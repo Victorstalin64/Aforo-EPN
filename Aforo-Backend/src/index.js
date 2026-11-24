@@ -1,9 +1,8 @@
-import express from 'express';
+import app from "./server.js"
+import connection from "./database.js"
 
-const app = express();
+connection()
 
-app.get('/', (req, res) => {
-    res.send('SERVER ON');
-});
-
-export default app;
+app.listen(app.get("port"), () => {
+    console.log(`Servidor AforoEPN ejecutándose en el puerto ${app.get("port")}`)
+})
